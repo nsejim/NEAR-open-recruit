@@ -1,0 +1,22 @@
+{
+  "name": "open-recruitment",
+  "version": "0.0.1",
+  "description": "A set of smart contracts to enable open and transparent recruitment process.",
+  "license": "UNLICENSED",
+  "private": true,
+  "scripts": {
+    "dev": "watch -d -n 1 'clear && yarn test:unit'",
+    "asp": "asp --verbose --nologo",
+    "test:unit": "yarn asp -f unit.spec",
+    "build": "asb --target debug",
+    "build:release": "asb",
+    "test": "yarn test:unit && yarn test:simulate",
+    "clean": "rm -rf ./build",
+    "test:debug": "node --inspect-brk ./node_modules/.bin/asp"
+  },
+  "keywords": [],
+  "author": "jimmy.nsenga@gmail.com",
+  "dependencies": {
+    "near-sdk-as": "^3.2.3"
+  }
+}
