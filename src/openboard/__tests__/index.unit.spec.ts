@@ -1,7 +1,7 @@
 
 import { Context, VMContext } from 'near-sdk-as'
-import { registerAsEmployer, postJob, updateJob, listJobs } from '../assembly';
-import { employers, jobs } from '../assembly/states';
+import { registerAsEmployer, postJob, updateJob, listJobs, apply, listApplications } from '../assembly';
+import { employers, jobs, applications } from '../assembly/states';
 
 describe('dRecruit Contract', () => {
 
@@ -76,9 +76,9 @@ describe('dRecruit Contract', () => {
 
     it('should returns a jobs list containing the created job', () => {
       registerAsEmployer({
-        name: 'NEAR',
-        accountId: ''
-      })
+  name: 'NEAR',
+  accountId: ''
+})
       const jobId = postJob({
         title: "Software Developer",
         deadline: <u64> Date.now()
@@ -118,6 +118,27 @@ describe('dRecruit Contract', () => {
       data = listJobs(true);
       expect(data.length).toBe(1);
 
+    })
+  })
+
+
+  describe('apply method', () => {
+    it('should correctly save the application', () => {
+      VMContext.setSigner_account_id("employer.testnet");
+      registerAsEmployer({
+        name: 'NEAR',
+        accountId: ''
+      })
+      const jobId = postJob({
+        title: "Devops Engineer",
+        deadline: <u64> Date.now()
+      })
+
+      VMContext.setSigner_account_id("alice.testnet");
+      apply(jobId, "Alice");
+      const receivedApplications = listApplications(jobId);
+      expect(receivedApplications.length).toBe(1);
+      expect(receivedApplications[0].applicantAccountId).toBe("alice.testnet");
     })
   })
 })

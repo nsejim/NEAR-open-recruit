@@ -1,15 +1,21 @@
 import { Context, logging } from 'near-sdk-as'
 
 import { Job, Employer, JobState, EmployerJobPair }  from "./models/job";
-import { jobs, employers } from './states';
+import { jobs, employers, applications } from './states';
 import { generateUniqueId } from '../../utils';
+import { Application } from './models/application';
 
 
 // changeMethods
 export function registerAsEmployer(employer: Employer): void {
   employer.accountId = Context.sender;
-  employers.set(employer.accountId, employer); // add the current sender account as employer
-  logging.log(`Employer ${Context.sender} is successfully registered!`)
+  if(employer.accountId) {
+    employers.set(employer.accountId, employer); // add the current sender account as employer
+    logging.log(`Employer ${Context.sender} is successfully registered!`)
+  } else {
+    logging.log(`Failed to create employer.`)
+  }
+
 }
 
 export function postJob(job: JobState): string {
@@ -41,6 +47,17 @@ export function updateJob(id: string, job: JobState): i32 {
   return <i32>oldJobIndex;
 }
 
+export function apply(jobId: string, name: string, openProofAccountId: string = ''): string {
+  const receivedApplications = listApplications(jobId);
+  assert(receivedApplications.findIndex(application => application.applicantAccountId === Context.sender) < 0, "A candidate can only apply once on a given job");
+  // if openProofAccountId, cross contract call
+  const existingApplicationIds: string[] = listApplications(jobId).map<string>(application => application.id);
+  const id: string = generateUniqueId("APP", existingApplicationIds);
+  const newApplication = new Application(id, jobId, name, openProofAccountId);
+  applications.push(newApplication);
+  return newApplication.id;
+}
+
 // viewMethods
 export function listJobs(myJobsOnly: boolean = false): EmployerJobPair[] {
   let allJobs: Array<Job> = [];
@@ -64,4 +81,20 @@ export function listJobs(myJobsOnly: boolean = false): EmployerJobPair[] {
       updatedOn: job.updatedOn
     }
   })
+}
+
+export function listApplications(jobId: string): Application[] {
+  let jobs = listJobs();
+  const jobIndex: i32 = <i32> jobs.map<string>(job => job.id).indexOf(jobId);
+  let job: EmployerJobPair = jobs[jobIndex];
+  let jobApplications: Array<Application> = [];
+  if (job) {  
+    for (let index = 0; index < applications.length; index++) {
+      const application = applications[index];
+      if (application.jobId == job.id) {
+        jobApplications.push(application);
+      }
+    } 
+  }
+  return jobApplications;
 }
