@@ -3,7 +3,7 @@ import { Context } from 'near-sdk-as';
 import { VMContext } from 'near-mock-vm';
 import { Job } from '../assembly/models/job';
 
-describe('Job ', () => {
+describe('Job Model', () => {
 
     beforeEach(() => {
         VMContext.setSigner_account_id("employer.testnet");

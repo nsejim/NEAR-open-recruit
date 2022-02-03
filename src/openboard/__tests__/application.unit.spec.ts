@@ -2,7 +2,7 @@ import { Context, VMContext } from "near-sdk-as";
 import { Application } from '../assembly/models/application';
 
 
-describe('Application', () => {
+describe('Application Model', () => {
     beforeEach(() => {
         VMContext.setSigner_account_id("alice.testnet");
     });

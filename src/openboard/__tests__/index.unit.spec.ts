@@ -3,7 +3,7 @@ import { Context, VMContext } from 'near-sdk-as'
 import { registerAsEmployer, postJob, updateJob, listJobs, apply, listApplications } from '../assembly';
 import { employers, jobs, applications } from '../assembly/states';
 
-describe('dRecruit Contract', () => {
+describe('openboard Contract', () => {
 
   beforeEach(() => {
     VMContext.setSigner_account_id("employer.testnet");
