@@ -9,7 +9,7 @@ export class Application {
         public id: string,
         public jobId: string,
         public name: string, 
-        public openProofAccountId: string = '') {
+        public proofIds: string[]) {
             this.createdOn = <u64>Context.blockTimestamp;
             this.applicantAccountId = Context.sender; // The  job is only created by the sender account
     }

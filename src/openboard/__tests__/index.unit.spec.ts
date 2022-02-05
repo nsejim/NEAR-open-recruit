@@ -135,7 +135,7 @@ describe('openboard Contract', () => {
       })
 
       VMContext.setSigner_account_id("alice.testnet");
-      apply(jobId, "Alice");
+      apply(jobId, "Alice", []);
       const receivedApplications = listApplications(jobId);
       expect(receivedApplications.length).toBe(1);
       expect(receivedApplications[0].applicantAccountId).toBe("alice.testnet");

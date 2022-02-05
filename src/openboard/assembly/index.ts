@@ -1,10 +1,12 @@
-import { Context, logging } from 'near-sdk-as'
+import { Context, ContractPromise, logging } from 'near-sdk-as'
 
 import { Job, Employer, JobState, EmployerJobPair }  from "./models/job";
 import { jobs, employers, applications } from './states';
 import { generateUniqueId } from '../../utils';
 import { Application } from './models/application';
+import { GetProofArgs } from './models/openProofAPI';
 
+const OPENPROOFS_CONTRACT= "openproofs.ncd.nsejim.test";
 
 // changeMethods
 export function registerAsEmployer(employer: Employer): void {
@@ -47,16 +49,33 @@ export function updateJob(id: string, job: JobState): i32 {
   return <i32>oldJobIndex;
 }
 
-export function apply(jobId: string, name: string, openProofAccountId: string = ''): string {
+export function apply(jobId: string, name: string, proofIds: string[]): string {
   const receivedApplications = listApplications(jobId);
   assert(receivedApplications.findIndex(application => application.applicantAccountId === Context.sender) < 0, "A candidate can only apply once on a given job");
-  // if openProofAccountId, cross contract call
   const existingApplicationIds: string[] = listApplications(jobId).map<string>(application => application.id);
   const id: string = generateUniqueId("APP", existingApplicationIds);
-  const newApplication = new Application(id, jobId, name, openProofAccountId);
+  const newApplication = new Application(id, jobId, name, proofIds);
   applications.push(newApplication);
   return newApplication.id;
 }
+
+
+export function viewProof(jobId: string, applicationId: string, proofId: string): void {
+      const application: Application = viewApplication(jobId, applicationId);
+      callGetProof(application.applicantAccountId, proofId);
+}
+
+function callGetProof(accountId: string, proofId: string): void {
+  let args: GetProofArgs = { accountId, proofId };
+  let promise = ContractPromise.create(
+                        OPENPROOFS_CONTRACT, 
+                        "getProof", 
+                        args, 
+                        100000000000000);
+  logging.log("Open Proof Contract called !")
+  promise.returnAsResult();
+}
+
 
 // viewMethods
 export function listJobs(myJobsOnly: boolean = false): EmployerJobPair[] {
@@ -97,4 +116,11 @@ export function listApplications(jobId: string): Application[] {
     } 
   }
   return jobApplications;
+}
+
+
+export function viewApplication(jobId: string, applicationId: string): Application {
+  const jobApplications = listApplications(jobId);
+  const applicationIdx = jobApplications.map<string>(app => app.id).indexOf(applicationId);
+  return jobApplications[applicationIdx];
 }

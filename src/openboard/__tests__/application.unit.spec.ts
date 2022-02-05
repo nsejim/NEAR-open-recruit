@@ -8,13 +8,13 @@ describe('Application Model', () => {
     });
 
     it('should correctly set the candidate account Id', () => {
-        const newApplication = new Application("1", "JOB-1234", "Alice");
+        const newApplication = new Application("1", "JOB-1234", "Alice", []);
 
         expect(newApplication.applicantAccountId).toBe("alice.testnet");
     })
 
     it('should have createdOn date set', () => {
-        const newApplication = new Application("1", "JOB-1234", "Alice");
+        const newApplication = new Application("1", "JOB-1234", "Alice", []);
 
         expect(newApplication.createdOn).toStrictEqual(Context.blockTimestamp);
     })
