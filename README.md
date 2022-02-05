@@ -84,109 +84,13 @@ yarn test                     # yarn test:unit && test:simulate
 
 ## UI Wireframes (TODO)
 
-More wireframes can be found in the `wireframes/` folder. Here are some examples showing how we envision the basic user interface elements.
-
-**Create a Proposal**
-
-![create-proposal](wireframes/create_proposal.png)
-
-**Supporting a Proposal**
-
-![support-project-proposal](wireframes/support_proposal_modal.png)
-
-**Map of Projects**
-
-![project-map](wireframes/project_map.png)
-
 ## File Structure (TODO)
 
-This contract is designed to be self-contained and so may be extracted into your own projects and used as a starting point.  If you do decide to use this code, please pay close attention to all top level files including:
 
-- NodeJS artifacts
-  - `package.json`: JavaScript project dependencies and several useful scripts
-
-- AssemblyScript artifacts
-  - `asconfig.json`: AssemblyScript project (and per contract) configuration including workspace configuration
-  - `as-pect.config.js`: as-pect unit testing dependency
-  - `src/tsconfig.json`: load TypeScript types
-  - `src/as_types.ts`: AssemblyScript types header file
-  - `src/as-pect.d.ts`: as-pect unit testing types header file
-
-
-The core file structure:
-
-```
-nearly-neighbors
-├── README.md                           <-- this file
-├── build                               <-- compiled contracts (WASM)
-│   ├── debug
-│   └── release
-├── simulation
-│   ├── Cargo.toml                      <-- simulation test config
-│   └── src                             <-- simulation tests
-│       ├── factory.rs
-│       ├── lib.rs
-│       ├── project.rs
-│       └── proposal.rs
-├── src
-│   ├── factory                         <-- factory contract with:
-│   │   ├── asconfig.json
-│   │   ├── assembly                    <--   source code
-│   │   │   └── index.ts
-│   │   └── __tests__                   <--   unit tests
-│   │       └── index.unit.spec.ts
-│   ├── project                         <-- project contract with:
-│   │   ├── asconfig.json
-│   │   ├── assembly                    <--   source code
-│   │   │   └── index.ts
-│   │   └── __tests__                   <--   unit tests
-│   │       └── index.unit.spec.ts
-│   ├── proposal                        <-- proposal contract with:
-│   │   ├── asconfig.json
-│   │   ├── assembly                    <--   source code
-│   │   │   └── index.ts
-│   │   └── __tests__                   <--   unit tests
-│   │       └── index.unit.spec.ts
-│   └── utils.ts
-└── wireframes                          <-- wireframe images
-```
-
-## Contracts
-
-There are three contracts that make up this project.
-
-By breaking out the logic into multiple contracts, we are employing NEAR development best practices which will make the code more secure (through rigorous testing of separated concerns) and robust (enabling complex features through [cross-contract calls](https://docs.near.org/docs/tutorials/how-to-write-contracts-that-talk-to-each-other)).
-
-### Proposal
-
-The proposal contract represents a user's proposed idea for a development project.
-
-Proposals are created by users (mediated by the [factory](#factory)) and hold data like:
-
-- Project details (what, where, why)
-- Funding parameters (target amount, minimum pledge, due date)
-
-The proposal accepts funding from _supporters_.
-
-If proposals are fully funded by their due date, then they are closed and converted to a [project](#project) (with all funds transferred to the new project's account).
-If proposals do not meet their funding goals, then they are closed and all funds are returned to the supporters.
-
-### Project
-
-The project contract represents a fully-funded proposal. It is managed by a _project owner_, who is authorized to access the project's NEAR tokens so that they can put those funds into use by actually executing on the real-world project.
-
-Projects are created automatically by the [factory](#factory) from a fully-funded [proposal](#proposal). Projects maintain a reference to their original proposal for proper record-keeping.
-
-Projects track their own real-world progress by reporting on key stats like:
-
-- Amount of funds used
-- % progress towards completion
 
 ### Factory (TO UNDERSTAND)
 
-The factory is a behind-the-scenes contract which takes care of the creation and setup of [proposals](#proposal) and [projects](#project). Instead of human users creating proposal and project contracts directly, they instead send requests to the factory which handles the necessary tasks for them.
 
-This is a pattern you'll see frequently in NEAR (and other blockchain) development: designating a contract with the responsibility for managing the lifecycle of other contracts. It helps abstract out the routine tasks of contract initialization and setup, limiting tedious user interactions and thus avoiding potential for user error.
 
 ## Live DApps on NEAR testnet (DONE)
 
